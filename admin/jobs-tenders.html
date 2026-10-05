@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jobs & Tenders | Human Appeal Pakistan</title>
+  <meta name="description" content="Current job openings and tender opportunities at Human Appeal Pakistan.">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/news.css">
+  <link rel="icon" type="image/x-icon" href="../images/logo.ico">
+</head>
+<body>
+
+  <header></header>
+
+  <main>
+
+    <section class="hero hero-news">
+      <div class="hero-overlay"></div>
+
+      <div class="container hero-container hero-container-single">
+        <div class="hero-content hero-content-centered">
+          <h1>Jobs & Tenders</h1>
+          <p>
+            Current vacancies and open tender opportunities at Human Appeal Pakistan.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- JOB ALERTS -->
+    <!-- ============================================ -->
+
+    <section>
+      <div class="container">
+
+        <div class="section-heading">
+          <h2>Job Openings</h2>
+        </div>
+
+        <div
+          class="articles-grid news-articles-grid"
+          id="jobs-grid"
+        >
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- TENDERS -->
+    <!-- ============================================ -->
+
+    <section>
+      <div class="container">
+
+        <div class="section-heading">
+          <h2>Open Tenders</h2>
+        </div>
+
+        <div
+          class="articles-grid news-articles-grid"
+          id="tenders-grid"
+        >
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer></footer>
+
+
+<script src="../js/config.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/main.js"></script>
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", async () => {
+
+      const [jobs, tenders] = await Promise.all([
+        DataManager.getJobAlerts(),
+        DataManager.getTenderAlerts()
+      ]);
+
+      renderJobs(jobs);
+      renderTenders(tenders);
+
+    });
+
+    // ---------------- Jobs ----------------
+
+    function renderJobs(jobs) {
+
+      const grid = document.getElementById("jobs-grid");
+      grid.innerHTML = "";
+
+      if (jobs.length === 0) {
+        grid.innerHTML = emptyStateHtml("No open positions at the moment.");
+        return;
+      }
+
+      jobs.forEach(job => {
+        grid.appendChild(buildCard({
+          tag: job.department || job.employment_type,
+          title: job.title,
+          metaLeft: job.location,
+          metaRight: formatDeadline(job.closing_date),
+          excerpt: job.description
+        }));
+      });
+
+    }
+
+    // ---------------- Tenders ----------------
+
+    function renderTenders(tenders) {
+
+      const grid = document.getElementById("tenders-grid");
+      grid.innerHTML = "";
+
+      if (tenders.length === 0) {
+        grid.innerHTML = emptyStateHtml("No open tenders at the moment.");
+        return;
+      }
+
+      tenders.forEach(tender => {
+        grid.appendChild(buildCard({
+          tag: tender.category,
+          title: tender.title,
+          metaLeft: tender.tenderNumber ? `Ref: ${tender.tenderNumber}` : "",
+          metaRight: formatDeadline(tender.deadline),
+          excerpt: tender.description
+        }));
+      });
+
+    }
+
+    // ---------------- Shared card builder ----------------
+
+    function buildCard({ tag, title, metaLeft, metaRight, excerpt }) {
+
+      const card = document.createElement("div");
+      card.className = "article-card";
+
+      card.innerHTML = `
+        <div class="article-card-body">
+
+          ${tag ? `<span class="article-tag" style="--tag-color:var(--ha-purple);">${tag}</span>` : ""}
+
+          <h3>${title}</h3>
+
+          <div class="article-meta">
+            ${metaLeft ? `<span>${metaLeft}</span>` : ""}
+            ${metaLeft && metaRight ? "&bull;" : ""}
+            ${metaRight ? `<span>${metaRight}</span>` : ""}
+          </div>
+
+          ${excerpt ? `<p>${excerpt}</p>` : ""}
+
+        </div>
+      `;
+
+      return card;
+
+    }
+
+    function formatDeadline(date) {
+
+      if (!date) return "";
+
+      const parsed = new Date(date);
+      if (Number.isNaN(parsed.getTime())) return "";
+
+      return `Closes ${parsed.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      })}`;
+
+    }
+
+    function emptyStateHtml(message) {
+      return `
+        <div class="news-empty-state">
+          <p class="news-empty-message">${message}</p>
+        </div>
+      `;
+    }
+
+  </script>
+
+</body>
+</html>

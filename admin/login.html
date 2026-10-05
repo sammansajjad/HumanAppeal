@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Admin Login | Human Appeal Pakistan</title>
+
+  <link rel="icon" type="image/x-icon" href="../images/logo.ico">
+  <link rel="stylesheet" href="../css/styles.css">
+
+
+  <!-- Password Eye CSS -->
+  <style>
+
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .password-wrapper .form-control {
+      width: 100%;
+      padding-right: 45px;
+      box-sizing: border-box;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+
+      border: none;
+      background: transparent;
+
+      cursor: pointer;
+
+      font-size: 18px;
+
+      padding: 5px;
+
+      line-height: 1;
+
+      color: #555;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .password-toggle:hover {
+      opacity: 0.7;
+    }
+
+    .password-toggle:focus {
+      outline: none;
+    }
+
+  </style>
+
+</head>
+
+
+<body class="admin-body">
+
+
+  <div class="container">
+
+    <div class="admin-login-card">
+
+
+      <h2>
+        Administrative Portal
+      </h2>
+
+
+      <p style="
+        text-align:center;
+        color: var(--text-muted);
+        margin-top:-20px;
+        margin-bottom:25px;
+        font-size:0.9rem;
+      ">
+        Sign in to manage content, alerts, and users.
+      </p>
+
+
+
+      <form id="login-form">
+
+
+        <!-- Email -->
+        <div class="form-group">
+
+          <label for="login-email">
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            id="login-email"
+            class="form-control"
+            placeholder="you@humanappeal.org.pk"
+            required
+            autocomplete="username"
+          >
+
+        </div>
+
+
+
+        <!-- Password -->
+        <div class="form-group">
+
+          <label for="login-password">
+            Password
+          </label>
+
+
+          <div class="password-wrapper">
+
+            <input
+              type="password"
+              id="login-password"
+              class="form-control"
+              placeholder="••••••••"
+              required
+              autocomplete="current-password"
+            >
+
+
+            <button
+              type="button"
+              id="toggle-password"
+              class="password-toggle"
+              aria-label="Show password"
+              title="Show password"
+            >
+              👁️
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Login Error -->
+        <div
+          id="login-error"
+          style="
+            display:none;
+            color:var(--ha-red);
+            font-size:0.9rem;
+            margin-bottom:15px;
+          ">
+        </div>
+
+
+
+        <!-- Sign In -->
+        <button
+          type="submit"
+          class="btn btn-primary"
+          style="width:100%;">
+
+          Sign In
+
+        </button>
+
+
+      </form>
+
+
+    </div>
+
+  </div>
+
+
+<script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+
+
+
+  <script>
+
+
+    // ==========================================
+    // If already logged in
+    // ==========================================
+
+    if (AuthAPI.getCurrentUser()) {
+
+      window.location.href = "./dashboard.html";
+
+    }
+
+
+
+    // ==========================================
+    // Password Show / Hide
+    // ==========================================
+
+    const passwordInput =
+      document.getElementById("login-password");
+
+    const togglePassword =
+      document.getElementById("toggle-password");
+
+
+    togglePassword.addEventListener("click", () => {
+
+
+      if (passwordInput.type === "password") {
+
+        // Show password
+        passwordInput.type = "text";
+
+        togglePassword.innerText = "🙈";
+
+        togglePassword.setAttribute(
+          "aria-label",
+          "Hide password"
+        );
+
+        togglePassword.setAttribute(
+          "title",
+          "Hide password"
+        );
+
+
+      } else {
+
+        // Hide password
+        passwordInput.type = "password";
+
+        togglePassword.innerText = "👁️";
+
+        togglePassword.setAttribute(
+          "aria-label",
+          "Show password"
+        );
+
+        togglePassword.setAttribute(
+          "title",
+          "Show password"
+        );
+
+      }
+
+    });
+
+
+
+    // ==========================================
+    // Login Form
+    // ==========================================
+
+    document
+      .getElementById("login-form")
+      .addEventListener("submit", async (e) => {
+
+
+        e.preventDefault();
+
+
+        const errorBox =
+          document.getElementById("login-error");
+
+
+        errorBox.style.display = "none";
+
+
+
+        const email =
+          document
+            .getElementById("login-email")
+            .value
+            .trim();
+
+
+
+        const password =
+          document
+            .getElementById("login-password")
+            .value;
+
+
+
+        try {
+
+
+          const user =
+            await AuthAPI.login(
+              email,
+              password
+            );
+
+
+
+          if (!user) {
+
+            errorBox.innerText =
+              "Invalid email or password.";
+
+            errorBox.style.display =
+              "block";
+
+            return;
+
+          }
+
+
+
+          window.location.href =
+            "./dashboard.html";
+
+
+        }
+
+
+        catch (err) {
+
+
+          errorBox.innerText =
+            err.message ||
+            "Unable to sign in.";
+
+
+          errorBox.style.display =
+            "block";
+
+
+        }
+
+
+      });
+
+
+  </script>
+
+
+</body>
+
+</html>

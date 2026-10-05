@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Manage Content | Human Appeal Pakistan Admin</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="icon" type="image/x-icon" href="../images/logo.ico">
+</head>
+<body class="admin-body"
+data-permission="manage_pages">
+
+  <div class="admin-nav">
+    <div class="container admin-nav-container">
+      <h2 style="color:#FFFFFF; font-size:1.4rem;">Administrative Portal</h2>
+      <div style="display:flex; align-items:center; gap:15px; color:#FFFFFF;">
+        <div style="text-align:right; line-height:1.3;">
+          <div id="current-user-name" style="font-weight:600;"></div>
+          <div id="current-user-role" style="font-size:0.75rem; opacity:0.75;"></div>
+        </div>
+        <button onclick="adminLogout()" class="btn btn-primary" style="padding:6px 15px; font-size:0.9rem;">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <div class="admin-dashboard-layout">
+      <aside class="admin-sidebar">
+        <div id="admin-sidebar-menu-holder"></div>
+      </aside>
+
+      <section class="admin-main" style="padding:0;">
+        <h2 id="section-heading" style="font-size:1.6rem; margin-bottom:25px; padding:30px 30px 0;">Manage Content</h2>
+
+        <div class="admin-metrics" id="metrics-grid" style="padding:0 30px 20px;"></div>
+
+        <div class="admin-actions-bar" style="padding:0 30px 25px;">
+          <div class="search-filters">
+            <div style="position:relative; flex-grow:1;">
+              <input type="text" id="search-input" class="form-control" placeholder="Search by title, author, description..." style="padding-left:40px;">
+              <span style="position:absolute; left:12px; top:12px; color:var(--text-muted); width:18px; height:18px;" id="search-icon-holder"></span>
+            </div>
+            <select id="filter-category" class="form-control" style="width:auto; min-width:180px;"></select>
+            <select id="filter-status" class="form-control" style="width:auto; min-width:140px;">
+              <option value="all">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+          <button class="btn btn-secondary" id="btn-add-item" style="white-space:nowrap; gap:5px;">
+            <span style="width:18px; height:18px; display:inline-flex; align-items:center;" id="plus-icon-holder"></span>
+            <span id="btn-add-label">Add New</span>
+          </button>
+        </div>
+
+        <div class="table-responsive" style="padding:0 30px 30px;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width:35%;">Title</th>
+                <th style="width:20%;">Category</th>
+                <th style="width:15%;">Author</th>
+                <th style="width:12%;">Date</th>
+                <th style="width:8%;">Status</th>
+                <th style="width:10%;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="modal-backdrop" id="item-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">Add New Item</h3>
+        <button class="modal-close-btn" id="modal-close-x" aria-label="Close modal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <form id="item-form">
+        <div class="form-group">
+          <label for="form-title">Title</label>
+          <input type="text" id="form-title" class="form-control" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+          <div class="form-group">
+            <label for="form-category">Category</label>
+            <select id="form-category" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label for="form-status">Status</label>
+            <select id="form-status" class="form-control" required>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+          <div class="form-group">
+            <label for="form-author">Author / Staff Name</label>
+            <input type="text" id="form-author" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="form-date">Publish Date</label>
+            <input type="date" id="form-date" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group" id="location-group" style="display:none;">
+          <label for="form-location">Location</label>
+          <input type="text" id="form-location" class="form-control" placeholder="E.g. Lasbela, Balochistan">
+        </div>
+
+        <div class="form-group">
+          <label>Cover Image (local file OR URL)</label>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <input type="file" id="form-cover-file" class="form-control" accept="image/*">
+            <div style="text-align:center; color:var(--text-muted); font-size:0.85rem; font-weight:500;">- OR -</div>
+            <input type="url" id="form-cover-url" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+          </div>
+          <div class="image-preview-container">
+            <div class="image-preview"><img id="preview-img" src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800" alt="Preview"></div>
+            <span style="font-size:0.85rem; color:var(--text-muted);">Cover image preview.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="form-excerpt">Short Summary / Excerpt</label>
+          <input type="text" id="form-excerpt" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="form-content">Full Body Content</label>
+          <textarea id="form-content" class="form-control" rows="8" required style="resize:vertical; font-family:inherit;"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-cancel-form">Cancel</button>
+          <button type="submit" class="btn btn-secondary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/admin-common.js"></script>
+  <script src="../js/content-admin.js"></script>
+  
+</body>
+</html>

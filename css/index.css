@@ -1,0 +1,27 @@
+.hero-buttons{
+    display:flex;
+    gap:15px;
+}
+
+.hero-outline-btn{
+    border-color:#fff;
+    color:#fff;
+}
+
+.view-all-wrapper{
+    text-align:center;
+    margin-top:50px;
+}
+
+.icon-inline{
+    width:16px;
+    height:16px;
+    display:inline-flex;
+    align-items:center;
+}
+
+.articles-empty{
+    grid-column:1/-1;
+    text-align:center;
+    color:var(--text-muted);
+}

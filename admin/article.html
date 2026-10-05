@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article Detail | Human Appeal Pakistan</title>
+  <meta name="description" content="Read full details and personal updates from our humanitarian workers and beneficiaries in Pakistan.">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/article.css">
+ <link rel="icon" type="image/x-icon" href="../images/logo.ico">
+</head>
+<body>
+
+  <header></header>
+
+  <main>
+    <article class="container">
+
+      <div class="article-header">
+        <div class="article-header-meta">
+          <span class="status-badge article-category-badge" id="article-category-badge">Category</span>
+          <span id="article-date-author" class="article-date-author">By Author &bull; Date</span>
+        </div>
+        <h1 id="article-title">Loading Article Title...</h1>
+      </div>
+
+      <div class="article-cover">
+        <img id="article-cover-img" src="" alt="Article cover placeholder"
+          onerror="this.src='https:'//images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800'">
+      </div>
+
+      <div class="article-layout">
+
+        <div class="article-body" id="article-body-content">
+        </div>
+
+        <div class="article-sidebar">
+
+          <div class="sidebar-widget">
+            <h4>Quick Actions</h4>
+
+            <p class="sidebar-description">
+              Support projects relating to this cause and deliver life-changing assistance today.
+            </p>
+
+            <a href="" id="sidebar-category-link"
+              class="btn btn-secondary sidebar-category-link">
+              View Category Projects
+            </a>
+
+            <a href="./categories.html"
+              class="btn btn-outline sidebar-outline-btn">
+              All focus sectors
+            </a>
+
+          </div>
+
+          <div class="sidebar-widget sidebar-share-widget">
+
+            <h4 class="sidebar-share-title">
+              Spread the Mercy
+            </h4>
+
+            <p class="sidebar-share-description">
+              "The best of people are those that bring most benefit to the rest of mankind."
+            </p>
+
+            <button class="btn btn-primary sidebar-share-btn"
+              onclick="shareArticle()">
+              Share This Story
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="related-section">
+        <h2>Related Stories &amp; Projects</h2>
+
+        <div class="related-grid" id="related-articles-grid">
+        </div>
+
+      </div>
+
+    </article>
+  </main>
+
+  <footer></footer>
+
+  <script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/main.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const articleId = urlParams.get("id");
+
+      if (!articleId) {
+        window.location.href = "./index.html";
+        return;
+      }
+
+      const article = await DataManager.getArticleById(articleId);
+      if (!article) {
+        window.location.href = "./index.html";
+        return;
+      }
+
+      document.title = `${article.title} | Human Appeal Pakistan`;
+      document.getElementById("article-title").innerText = article.title;
+
+      const formattedDate = new Date(article.date).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      });
+
+      document.getElementById("article-date-author").innerHTML =
+        `By <strong>${article.author}</strong> &bull; Published on ${formattedDate}`;
+
+      const badge = document.getElementById("article-category-badge");
+      const catColors = DataManager.getCategoryColors();
+      const themeColor = catColors[article.category] || "var(--ha-purple)";
+
+      badge.innerText = article.category;
+      badge.style.setProperty("--badge-color", themeColor);
+
+      const coverImg = document.getElementById("article-cover-img");
+      coverImg.src = article.coverImage;
+      coverImg.alt = article.title;
+
+      const bodyContent = document.getElementById("article-body-content");
+      bodyContent.innerHTML = "";
+
+      const paragraphs = article.content.split("\n\n");
+
+      paragraphs.forEach(p => {
+        const pEl = document.createElement("p");
+        pEl.innerHTML = p.replace(/\n/g, "<br>");
+        bodyContent.appendChild(pEl);
+      });
+
+      const catLink = document.getElementById("sidebar-category-link");
+      catLink.href = `./category.html?id=${encodeURIComponent(article.category)}`;
+      catLink.style.setProperty("--category-color", themeColor);
+
+      await renderRelatedArticles(article);
+    });
+
+    async function renderRelatedArticles(currentArt) {
+
+      const grid = document.getElementById("related-articles-grid");
+      const allCategoryArticles = await DataManager.getArticlesByCategory(currentArt.category);
+      const catColors = DataManager.getCategoryColors();
+
+      const related = allCategoryArticles
+        .filter(art => art.id !== currentArt.id)
+        .slice(0, 3);
+
+      grid.innerHTML = "";
+
+      if (related.length === 0) {
+        grid.innerHTML =
+          `<p class="related-empty-message">No other stories in this category found.</p>`;
+        return;
+      }
+
+      const catColor = catColors[currentArt.category] || "var(--ha-purple)";
+
+      related.forEach(art => {
+
+        const card = document.createElement("div");
+        card.className = "article-card";
+
+        card.innerHTML = `
+          <div class="article-card-image">
+
+            <span class="article-tag"
+                  style="--tag-color:${catColor}">
+              ${art.category}
+            </span>
+
+            <img src="${art.coverImage}"
+                 alt="${art.title}"
+                 onerror="this.src='https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800'">
+
+          </div>
+
+          <div class="article-card-body">
+
+            <div class="article-meta">
+              <span>By ${art.author}</span>
+              &bull;
+              <span>${new Date(art.date).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric"
+              })}</span>
+            </div>
+
+            <h3>${art.title}</h3>
+
+            <p>${art.excerpt}</p>
+
+            <a href="./article.html?id=${art.id}"
+               class="article-card-link"
+               style="--link-color:${catColor};">
+
+              <span>Read Story</span>
+
+              <span class="article-link-icon">
+                ${window.getIconSvg("arrowRight", catColor)}
+              </span>
+
+            </a>
+
+          </div>
+        `;
+
+        grid.appendChild(card);
+
+      });
+
+    }
+
+    function shareArticle() {
+
+      navigator.clipboard.writeText(window.location.href)
+        .then(() => {
+          window.showToast(
+            "Link copied to clipboard! Share the story of mercy.",
+            "success"
+          );
+        })
+        .catch(() => {
+          window.showToast(
+            "Failed to copy link. Please manually copy the URL.",
+            "error"
+          );
+        });
+
+    }
+  </script>
+
+</body>
+</html>

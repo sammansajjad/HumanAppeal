@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+
+<title>
+Manage Navigation | Human Appeal Pakistan Admin
+</title>
+
+
+<link
+    rel="stylesheet"
+    href="../css/styles.css"
+>
+<link rel="icon" type="image/x-icon" href="../images/logo.ico">
+
+
+</head>
+
+
+
+<body
+class="admin-body"
+data-permission="manage_navigation"
+>
+
+
+
+<!-- =========================================
+     ADMIN TOP NAV
+========================================= -->
+
+<div class="admin-nav">
+
+
+    <div class="container admin-nav-container">
+
+
+        <h2
+        style="color:#FFFFFF;font-size:1.4rem;"
+        >
+            Administrative Portal
+        </h2>
+
+
+
+        <div
+        style="
+        display:flex;
+        align-items:center;
+        gap:15px;
+        color:#FFFFFF;
+        "
+        >
+
+
+            <div
+            style="
+            text-align:right;
+            line-height:1.3;
+            "
+            >
+
+
+                <div
+                id="current-user-name"
+                style="font-weight:600;"
+                >
+                </div>
+
+
+                <div
+                id="current-user-role"
+                style="
+                font-size:0.75rem;
+                opacity:0.75;
+                "
+                >
+                </div>
+
+
+            </div>
+
+
+
+            <button
+            onclick="adminLogout()"
+            class="btn btn-primary"
+            >
+                Logout
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+<!-- =========================================
+     MAIN ADMIN AREA
+========================================= -->
+
+<main class="container">
+
+
+    <div class="admin-dashboard-layout">
+
+
+
+        <!-- =================================
+             SIDEBAR
+        ================================== -->
+
+        <aside class="admin-sidebar">
+
+
+            <div
+            id="admin-sidebar-menu-holder"
+            >
+            </div>
+
+
+        </aside>
+
+
+
+
+
+        <!-- =================================
+             MAIN CONTENT
+        ================================== -->
+
+        <section class="admin-main">
+
+
+            <h2>
+                Manage Navigation
+            </h2>
+
+
+
+            <div class="admin-actions-bar">
+
+
+                <select
+                id="menu-select"
+                class="form-control"
+                style="max-width:300px;"
+                >
+                </select>
+
+
+
+                <button
+                id="btn-add-navigation"
+                class="btn btn-secondary"
+                >
+                    Add Navigation
+                </button>
+
+
+            </div>
+
+
+
+
+
+            <!-- =================================
+                 NAVIGATION TABLE
+            ================================== -->
+
+            <div class="table-responsive">
+
+
+                <table class="admin-table">
+
+
+                    <thead>
+
+
+                        <tr>
+
+                            <th>
+                                Order
+                            </th>
+
+                            <th>
+                                Title
+                            </th>
+
+                            <th>
+                                URL
+                            </th>
+
+                            <th>
+                                Parent
+                            </th>
+
+                    
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+
+                    </thead>
+
+
+
+                    <tbody
+                    id="table-body"
+                    >
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+    </div>
+
+
+</main>
+
+
+
+
+
+<!-- =========================================
+     NAVIGATION MODAL
+========================================= -->
+
+<div
+class="modal-backdrop"
+id="navigation-modal"
+>
+
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+
+            <h3
+            id="modal-title"
+            >
+                Add Navigation
+            </h3>
+
+
+
+            <button
+            id="modal-close-x"
+            type="button"
+            >
+                X
+            </button>
+
+
+        </div>
+
+
+
+
+
+        <form
+        id="navigation-form"
+        >
+
+
+            <!-- Hidden ID -->
+
+            <input
+            type="hidden"
+            id="form-id"
+            >
+
+
+
+            <!-- Menu -->
+
+            <div class="form-group">
+
+
+                <label>
+                    Menu
+                </label>
+
+
+                <select
+                id="form-menu"
+                class="form-control"
+                required
+                >
+                </select>
+
+
+            </div>
+
+
+
+
+            <!-- Title -->
+
+            <div class="form-group">
+
+
+                <label>
+                    Title
+                </label>
+
+
+                <input
+                id="form-label-en"
+                class="form-control"
+                placeholder="Example: About Us"
+                required
+                >
+
+
+            </div>
+
+
+
+
+            <!-- Urdu Title -->
+
+            <div class="form-group">
+
+
+                <label>
+                    Urdu Title
+                </label>
+
+
+                <input
+                id="form-label-ur"
+                class="form-control"
+                placeholder="اردو عنوان"
+                >
+
+
+            </div>
+
+
+
+
+            <!-- URL -->
+
+            <div class="form-group">
+
+
+                <label>
+                    URL
+                </label>
+
+
+                <input
+                id="form-url"
+                class="form-control"
+                placeholder="/about"
+                >
+
+
+            </div>
+
+
+
+
+            <!-- Type -->
+
+            <div class="form-group">
+
+
+                <label>
+                    Type
+                </label>
+
+
+                <select
+                id="form-type"
+                class="form-control"
+                >
+
+
+                    <option value="custom">
+                        Custom
+                    </option>
+
+
+                    <option value="page">
+                        Page
+                    </option>
+
+
+                    <option value="category">
+                        Category
+                    </option>
+
+
+                    <option value="external">
+                        External
+                    </option>
+
+
+                </select>
+
+
+            </div>
+
+
+
+
+            <!-- Parent -->
+
+            <div class="form-group">
+
+
+                <label>
+                    Parent Item
+                </label>
+
+
+                <select
+                id="form-parent"
+                class="form-control"
+                >
+
+
+                    <option value="">
+                        None
+                    </option>
+
+
+                </select>
+
+
+            </div>
+
+
+
+
+            <!-- Target -->
+
+            <div class="form-group">
+
+
+                <label>
+                    Target
+                </label>
+
+
+                <select
+                id="form-target"
+                class="form-control"
+                >
+
+
+                    <option value="_self">
+                        Same Window
+                    </option>
+
+
+                    <option value="_blank">
+                        New Window
+                    </option>
+
+
+                </select>
+
+
+            </div>
+
+
+
+
+            
+               
+
+
+
+
+            <!-- Sort Order -->
+
+            <div class="form-group">
+
+
+                <label>
+                    Sort Order
+                </label>
+
+
+                <input
+                id="form-sort-order"
+                type="number"
+                class="form-control"
+                value="0"
+                >
+
+
+            </div>
+
+
+
+
+            <!-- Status -->
+
+            <div class="form-group">
+
+
+                <label>
+                    Status
+                </label>
+
+
+                <select
+                id="form-status"
+                class="form-control"
+                >
+
+
+                    <option value="1">
+                        Active
+                    </option>
+
+
+                    <option value="0">
+                        Inactive
+                    </option>
+
+
+                </select>
+
+
+            </div>
+
+
+
+
+
+            <!-- =================================
+                 MODAL FOOTER
+            ================================== -->
+
+            <div class="modal-footer">
+
+
+                <button
+                type="button"
+                id="btn-cancel-form"
+                class="btn btn-outline"
+                >
+                    Cancel
+                </button>
+
+
+
+                <button
+                type="submit"
+                class="btn btn-secondary"
+                >
+                    Save
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+<!-- =========================================
+     JS
+========================================= -->
+
+<script src="../js/api.js"></script>
+
+<script src="../js/admin-common.js"></script>
+
+<script src="../js/config.js"></script>
+<script src="../js/permissionUI.js"></script>
+
+<script src="../js/navigation.js"></script>
+
+
+</body>
+
+
+</html>

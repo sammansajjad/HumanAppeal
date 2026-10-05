@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Category Projects | Human Appeal Pakistan</title>
+  <meta name="description" content="View stories, project updates, and impact reports for specific humanitarian campaigns run by Human Appeal Pakistan.">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/category.css">
+  <link rel="icon" type="image/x-icon" href="../images/logo.ico">
+</head>
+<body>
+
+  <header></header>
+
+  <main>
+    <section class="category-banner" id="category-banner-bg">
+      <div class="container">
+        <h1 id="category-title">Loading Category...</h1>
+        <p id="category-desc">Loading details...</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="article-layout">
+
+          <div>
+            <h2 id="category-section-title">Project Stories &amp; Impact Reports</h2>
+
+            <div class="articles-grid" id="category-articles-container">
+            </div>
+
+            <div class="load-more-container" id="load-more-container">
+              <button class="btn btn-outline load-more-btn-theme" id="load-more-btn">
+                Load More Stories
+              </button>
+            </div>
+
+          </div>
+
+          <div class="article-sidebar">
+
+            <div class="sidebar-widget sidebar-widget-featured">
+
+              <h3 id="widget-title" class="widget-title-themed">
+                Sector Stories
+              </h3>
+
+              <p class="sidebar-widget-description">
+                Read all field updates in this sector, or contact us to find out how you can support our local teams.
+              </p>
+
+              <div class="sidebar-button-group">
+
+                <a href="./news.html"
+                   class="btn btn-primary sidebar-btn-themed"
+                   id="btn-vol">
+                  Browse All Stories
+                </a>
+
+                <a href="./contact.html"
+                   class="btn btn-outline sidebar-btn-outline-themed"
+                   id="btn-inq">
+                  Submit an Inquiry
+                </a>
+
+              </div>
+
+            </div>
+
+            <div class="sidebar-widget">
+
+              <h4>Direct Office Impact</h4>
+
+              <p class="sidebar-widget-text">
+                Every project run under this category is verified, supervised, and audited by our Islamabad main office to ensure maximum transparency.
+              </p>
+
+              <a href="./about.html#contact-section"
+                 class="article-card-link coordinator-link">
+                Contact Coordinator &rarr;
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer></footer>
+<script src="../js/config.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/main.js"></script>
+
+  <script>
+    let filteredArticles = [];
+    let visibleCount = 4;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoryName = urlParams.get("id");
+
+      if (!categoryName) {
+        window.location.href = "./categories.html";
+        return;
+      }
+
+      const catInfo = DataManager.getCategoriesInfo()[categoryName];
+
+      if (!catInfo) {
+        window.location.href = "./categories.html";
+        return;
+      }
+
+      document.title = `${categoryName} Projects | Human Appeal Pakistan`;
+
+      document.getElementById("category-title").innerText = categoryName;
+      document.getElementById("category-desc").innerText = catInfo.description;
+
+      const bannerBg = document.getElementById("category-banner-bg");
+      bannerBg.style.setProperty("--banner-color", catInfo.color);
+      document.documentElement.style.setProperty("--banner-color", catInfo.color);
+
+      const btnVol = document.getElementById("btn-vol");
+      const btnInq = document.getElementById("btn-inq");
+      const wTitle = document.getElementById("widget-title");
+      const loadMoreBtn = document.getElementById("load-more-btn");
+
+      btnVol.style.setProperty("--theme-color", catInfo.color);
+      btnInq.style.setProperty("--theme-color", catInfo.color);
+      wTitle.style.setProperty("--theme-color", catInfo.color);
+      loadMoreBtn.style.setProperty("--theme-color", catInfo.color);
+
+      filteredArticles = await DataManager.getArticlesByCategory(categoryName);
+
+      renderCategoryArticles();
+
+      loadMoreBtn.addEventListener("click", () => {
+        visibleCount += 4;
+        renderCategoryArticles();
+      });
+
+    });
+
+    function renderCategoryArticles() {
+
+      const container = document.getElementById("category-articles-container");
+      const loadMoreContainer = document.getElementById("load-more-container");
+      const catColors = DataManager.getCategoryColors();
+
+      container.innerHTML = "";
+
+      if (filteredArticles.length === 0) {
+
+        container.innerHTML = `
+          <div class="empty-category-state">
+            <p class="empty-category-message">
+              No articles or projects currently published in this category.
+            </p>
+
+            <a href="./categories.html" class="btn btn-secondary">
+              Browse Other Categories
+            </a>
+          </div>
+        `;
+
+        loadMoreContainer.style.display = "none";
+        return;
+      }
+
+      const visibleSlice = filteredArticles.slice(0, visibleCount);
+      const catColor = catColors[filteredArticles[0].category] || "var(--ha-purple)";
+
+      visibleSlice.forEach(art => {
+
+        const card = document.createElement("div");
+        card.className = "article-card";
+
+        card.innerHTML = `
+          <div class="article-card-image">
+
+            <span class="article-tag"
+                  style="--tag-color:${catColor};">
+              ${art.category}
+            </span>
+
+            <img src="${art.coverImage}"
+                 alt="${art.title}"
+                 onerror="this.src='https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800'">
+
+          </div>
+
+          <div class="article-card-body">
+
+            <div class="article-meta">
+              <span>By ${art.author}</span>
+              &bull;
+              <span>${new Date(art.date).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+              })}</span>
+            </div>
+
+            <h3>${art.title}</h3>
+
+            <p>${art.excerpt}</p>
+
+            <a href="./article.html?id=${art.id}"
+               class="article-card-link"
+               style="--link-color:${catColor};">
+
+              <span>Read Story</span>
+
+              <span class="article-link-icon">
+                ${window.getIconSvg("arrowRight", catColor)}
+              </span>
+
+            </a>
+
+          </div>
+        `;
+
+        container.appendChild(card);
+
+      });
+
+      if (filteredArticles.length > visibleCount) {
+        loadMoreContainer.classList.remove("hidden");
+      } else {
+        loadMoreContainer.classList.add("hidden");
+      }
+
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+    Manage Permissions | Human Appeal Pakistan Admin
+</title>
+
+<link
+    rel="stylesheet"
+    href="../css/styles.css"
+>
+
+<link
+    rel="icon"
+    type="image/x-icon"
+    href="../images/logo.ico"
+>
+
+</head>
+
+
+<body
+    class="admin-body"
+    data-permission="permissions.view"
+>
+
+
+<!-- ===============================
+     ADMIN NAVIGATION
+================================ -->
+
+<div class="admin-nav">
+
+    <div class="container admin-nav-container">
+
+        <h2
+            style="
+                color:#FFFFFF;
+                font-size:1.4rem;
+            "
+        >
+            Administrative Portal
+        </h2>
+
+
+        <div
+            style="
+                display:flex;
+                align-items:center;
+                gap:15px;
+                color:#FFFFFF;
+            "
+        >
+
+            <div
+                style="
+                    text-align:right;
+                    line-height:1.3;
+                "
+            >
+
+                <div
+                    id="current-user-name"
+                    style="font-weight:600;"
+                ></div>
+
+
+                <div
+                    id="current-user-role"
+                    style="
+                        font-size:0.75rem;
+                        opacity:0.75;
+                    "
+                ></div>
+
+            </div>
+
+
+            <button
+                onclick="adminLogout()"
+                class="btn btn-primary"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===============================
+     MAIN CONTENT
+================================ -->
+
+<main class="container">
+
+    <div class="admin-dashboard-layout">
+
+
+        <!-- ===============================
+             SIDEBAR
+        ================================ -->
+
+        <aside class="admin-sidebar">
+
+            <div
+                id="admin-sidebar-menu-holder"
+            ></div>
+
+        </aside>
+
+
+        <!-- ===============================
+             MAIN
+        ================================ -->
+
+        <section class="admin-main">
+
+            <h2>
+                Manage Permissions
+            </h2>
+
+
+            <!-- ===============================
+                 ACTION BAR
+            ================================ -->
+
+            <div class="admin-actions-bar">
+
+                <input
+                    id="search-input"
+                    class="form-control"
+                    placeholder="Search permissions..."
+                >
+
+
+                <button
+                    id="btn-add-permission"
+                    class="btn btn-secondary"
+                    style="display:none;"
+                >
+                    Add New Permission
+                </button>
+
+            </div>
+
+
+            <!-- ===============================
+                 PERMISSIONS TABLE
+            ================================ -->
+
+            <div class="table-responsive">
+
+                <table class="admin-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Permission
+                            </th>
+
+                            <th>
+                                Guard
+                            </th>
+
+                            <th>
+                                Created
+                            </th>
+
+                            <th>
+                                Updated
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="table-body"
+                    >
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<!-- ===============================
+     PERMISSION MODAL
+================================ -->
+
+<div
+    class="modal-backdrop"
+    id="permission-modal"
+>
+
+    <div class="modal-content">
+
+
+        <!-- ===============================
+             MODAL HEADER
+        ================================ -->
+
+        <div class="modal-header">
+
+            <h3
+                id="modal-title"
+            >
+                Add Permission
+            </h3>
+
+
+            <button
+                type="button"
+                id="modal-close-x"
+            >
+                X
+            </button>
+
+        </div>
+
+
+        <!-- ===============================
+             FORM
+        ================================ -->
+
+        <form
+            id="permission-form"
+        >
+
+
+            <!-- PERMISSION NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Permission Name
+                </label>
+
+
+                <input
+                    id="form-name"
+                    class="form-control"
+                    placeholder="Example: manage_pages"
+                    maxlength="255"
+                    required
+                >
+
+
+                <small>
+                    Use a unique permission name such as
+                    manage_pages or permissions.view.
+                </small>
+
+            </div>
+
+
+            <!-- GUARD -->
+
+            <div class="form-group">
+
+                <label>
+                    Guard Name
+                </label>
+
+
+                <input
+                    id="form-guard-name"
+                    class="form-control"
+                    value="web"
+                    maxlength="255"
+                    required
+                >
+
+            </div>
+
+
+            <!-- MODAL FOOTER -->
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    id="btn-cancel-form"
+                    class="btn btn-outline"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-secondary"
+                >
+                    Save
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ===============================
+     JAVASCRIPT
+================================ -->
+
+<script src="../js/api.js"></script>
+
+<script src="../js/admin-common.js"></script>
+
+<script src="../js/permissionUI.js"></script>
+<script src="../js/config.js"></script>
+
+<script>
+
+
+// ===============================
+// CURRENT USER
+// ===============================
+
+const currentUser =
+    AuthAPI.requireLogin("./login.html");
+
+
+let permissions = [];
+
+let editId = null;
+
+
+// ===============================
+// INITIALIZE
+// ===============================
+
+(async function () {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "current-user-name"
+    ).innerText =
+        currentUser.name || "";
+
+
+    document.getElementById(
+        "current-user-role"
+    ).innerText =
+        currentUser.role || "";
+
+
+    renderAdminSidebar(
+        currentUser,
+        "permissions.html"
+    );
+
+
+    setupPermissionActions();
+
+
+    await loadPermissions();
+
+})();
+
+
+// ===============================
+// SETUP PERMISSION ACTIONS
+// ===============================
+
+function setupPermissionActions() {
+
+    /*
+     * Only users with create permission
+     * can see the Add button.
+     */
+
+    if (
+        window.roleHasPermission(
+            currentUser,
+            "permissions.create"
+        )
+    ) {
+
+        document.getElementById(
+            "btn-add-permission"
+        ).style.display = "inline-block";
+
+    }
+
+
+    /*
+     * ADD BUTTON
+     */
+
+    document.getElementById(
+        "btn-add-permission"
+    ).addEventListener(
+        "click",
+        () => openModal()
+    );
+
+
+    /*
+     * SEARCH
+     */
+
+    document.getElementById(
+        "search-input"
+    ).addEventListener(
+        "input",
+        renderPermissions
+    );
+
+
+    /*
+     * MODAL CLOSE
+     */
+
+    document.getElementById(
+        "modal-close-x"
+    ).onclick =
+        closeModal;
+
+
+    document.getElementById(
+        "btn-cancel-form"
+    ).onclick =
+        closeModal;
+
+
+    /*
+     * FORM
+     */
+
+    document.getElementById(
+        "permission-form"
+    ).addEventListener(
+        "submit",
+        savePermission
+    );
+
+}
+
+
+// ===============================
+// LOAD PERMISSIONS
+// ===============================
+
+async function loadPermissions() {
+
+    try {
+
+        const response =
+            await API.get(
+                "/permissions"
+            );
+
+
+        console.log(
+            "FULL PERMISSIONS RESPONSE:",
+            response
+        );
+
+
+        permissions =
+            response.data || [];
+
+
+        console.log(
+            "PERMISSIONS:",
+            permissions
+        );
+
+
+        renderPermissions();
+
+    }
+    catch (error) {
+
+        console.error(
+            "LOAD PERMISSIONS ERROR:",
+            error
+        );
+
+
+        showToast(
+            error.message ||
+            "Unable to load permissions",
+            "error"
+        );
+
+    }
+
+}
+
+
+// ===============================
+// RENDER PERMISSIONS
+// ===============================
+
+function renderPermissions() {
+
+    const searchInput =
+        document.getElementById(
+            "search-input"
+        );
+
+
+    const search =
+        searchInput
+            ? searchInput.value
+                .toLowerCase()
+                .trim()
+            : "";
+
+
+    let list =
+        permissions;
+
+
+    if (search) {
+
+        list =
+            permissions.filter(
+                permission => {
+
+                    const name =
+                        String(
+                            permission.name ||
+                            ""
+                        )
+                        .toLowerCase();
+
+
+                    const guard =
+                        String(
+                            permission.guard_name ||
+                            ""
+                        )
+                        .toLowerCase();
+
+
+                    return (
+                        name.includes(search) ||
+                        guard.includes(search)
+                    );
+
+                }
+            );
+
+    }
+
+
+    const tbody =
+        document.getElementById(
+            "table-body"
+        );
+
+
+    if (!tbody) {
+
+        return;
+
+    }
+
+
+    if (list.length === 0) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="6"
+                    style="text-align:center"
+                >
+                    No permissions found
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        list.map(
+            permission => {
+
+                const canUpdate =
+                    window.roleHasPermission(
+                        currentUser,
+                        "permissions.update"
+                    );
+
+
+                const canDelete =
+                    window.roleHasPermission(
+                        currentUser,
+                        "permissions.delete"
+                    );
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            ${escapeHtml(
+                                permission.id
+                            )}
+                        </td>
+
+
+                        <td>
+                            ${escapeHtml(
+                                permission.name ||
+                                "-"
+                            )}
+                        </td>
+
+
+                        <td>
+                            ${escapeHtml(
+                                permission.guard_name ||
+                                "-"
+                            )}
+                        </td>
+
+
+                        <td>
+                            ${escapeHtml(
+                                permission.created_at ||
+                                "-"
+                            )}
+                        </td>
+
+
+                        <td>
+                            ${escapeHtml(
+                                permission.updated_at ||
+                                "-"
+                            )}
+                        </td>
+
+
+                        <td>
+
+                            ${
+                                canUpdate
+                                    ? `
+                                        <button
+                                            onclick="editPermission(${permission.id})"
+                                        >
+                                            Edit
+                                        </button>
+                                      `
+                                    : ""
+                            }
+
+
+                            ${
+                                canDelete
+                                    ? `
+                                        <button
+                                            onclick="deletePermission(${permission.id})"
+                                        >
+                                            Delete
+                                        </button>
+                                      `
+                                    : ""
+                            }
+
+
+                            ${
+                                !canUpdate &&
+                                !canDelete
+                                    ? "-"
+                                    : ""
+                            }
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        )
+        .join("");
+
+}
+
+
+// ===============================
+// OPEN MODAL
+// ===============================
+
+function openModal(permission = null) {
+
+    document
+        .getElementById(
+            "permission-form"
+        )
+        .reset();
+
+
+    /*
+     * Default guard.
+     */
+
+    document.getElementById(
+        "form-guard-name"
+    ).value =
+        "web";
+
+
+    if (permission) {
+
+        editId =
+            permission.id;
+
+
+        document.getElementById(
+            "modal-title"
+        ).innerText =
+            "Edit Permission";
+
+
+        document.getElementById(
+            "form-name"
+        ).value =
+            permission.name || "";
+
+
+        document.getElementById(
+            "form-guard-name"
+        ).value =
+            permission.guard_name ||
+            "web";
+
+    }
+    else {
+
+        editId = null;
+
+
+        document.getElementById(
+            "modal-title"
+        ).innerText =
+            "Add Permission";
+
+    }
+
+
+    document
+        .getElementById(
+            "permission-modal"
+        )
+        .classList
+        .add("show");
+
+}
+
+
+// ===============================
+// CLOSE MODAL
+// ===============================
+
+function closeModal() {
+
+    document
+        .getElementById(
+            "permission-modal"
+        )
+        .classList
+        .remove("show");
+
+}
+
+
+// ===============================
+// SAVE PERMISSION
+// ===============================
+
+async function savePermission(e) {
+
+    e.preventDefault();
+
+
+    const name =
+        document.getElementById(
+            "form-name"
+        )
+        .value
+        .trim();
+
+
+    const guardName =
+        document.getElementById(
+            "form-guard-name"
+        )
+        .value
+        .trim();
+
+
+    if (!name) {
+
+        showToast(
+            "Permission name is required",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!guardName) {
+
+        showToast(
+            "Guard name is required",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const data = {
+
+        name:
+            name,
+
+        guard_name:
+            guardName
+
+    };
+
+
+    console.log(
+        "SENDING PERMISSION DATA:",
+        data
+    );
+
+
+    try {
+
+        if (editId) {
+
+            /*
+             * UPDATE
+             */
+
+            if (
+                !window.roleHasPermission(
+                    currentUser,
+                    "permissions.update"
+                )
+            ) {
+
+                showToast(
+                    "You do not have permission to update permissions",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            await API.put(
+                "/permissions/" +
+                editId,
+                data
+            );
+
+        }
+        else {
+
+            /*
+             * CREATE
+             */
+
+            if (
+                !window.roleHasPermission(
+                    currentUser,
+                    "permissions.create"
+                )
+            ) {
+
+                showToast(
+                    "You do not have permission to create permissions",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            await API.post(
+                "/permissions",
+                data
+            );
+
+        }
+
+
+        const wasEditing =
+            Boolean(editId);
+
+
+        closeModal();
+
+
+        await loadPermissions();
+
+
+        showToast(
+            wasEditing
+                ? "Permission updated successfully"
+                : "Permission created successfully",
+            "success"
+        );
+
+
+        editId = null;
+
+    }
+    catch (error) {
+
+        console.error(
+            "SAVE PERMISSION ERROR:",
+            error
+        );
+
+
+        showToast(
+            error.message ||
+            "Save failed",
+            "error"
+        );
+
+    }
+
+}
+
+
+// ===============================
+// EDIT PERMISSION
+// ===============================
+
+window.editPermission =
+    function (id) {
+
+        if (
+            !window.roleHasPermission(
+                currentUser,
+                "permissions.update"
+            )
+        ) {
+
+            showToast(
+                "You do not have permission to update permissions",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const permission =
+            permissions.find(
+                p =>
+                    Number(p.id) ===
+                    Number(id)
+            );
+
+
+        if (!permission) {
+
+            showToast(
+                "Permission not found",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            "EDIT PERMISSION:",
+            permission
+        );
+
+
+        openModal(
+            permission
+        );
+
+    };
+
+
+// ===============================
+// DELETE PERMISSION
+// ===============================
+
+window.deletePermission =
+    async function (id) {
+
+        if (
+            !window.roleHasPermission(
+                currentUser,
+                "permissions.delete"
+            )
+        ) {
+
+            showToast(
+                "You do not have permission to delete permissions",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const permission =
+            permissions.find(
+                p =>
+                    Number(p.id) ===
+                    Number(id)
+            );
+
+
+        if (!permission) {
+
+            showToast(
+                "Permission not found",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if (
+            !confirm(
+                `Delete permission "${permission.name}"?`
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        try {
+
+            await API.delete(
+                "/permissions/" +
+                id
+            );
+
+
+            await loadPermissions();
+
+
+            showToast(
+                "Permission deleted successfully",
+                "success"
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "DELETE PERMISSION ERROR:",
+                error
+            );
+
+
+            showToast(
+                error.message ||
+                "Delete failed",
+                "error"
+            );
+
+        }
+
+    };
+
+
+// ===============================
+// HTML ESCAPE
+// ===============================
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// ===============================
+// LOGOUT
+// ===============================
+
+function adminLogout() {
+
+    AuthAPI.logout();
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

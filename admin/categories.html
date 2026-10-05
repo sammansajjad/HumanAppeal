@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Projects & Focus Sectors | Human Appeal Pakistan</title>
+  <meta name="description" content="Explore our key humanitarian sectors in Pakistan, including clean water, healthcare, education, livelihoods, emergency response, and orphan care.">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/categories.css">
+ <link rel="icon" type="image/x-icon" href="../images/logo.ico">
+</head>
+<body>
+
+  <header></header>
+
+  <main>
+
+    <section class="hero hero-sectors">
+      <div class="hero-overlay"></div>
+
+      <div class="container hero-container hero-container-single">
+        <div class="hero-content hero-content-centered">
+          <h1 id="page-title">Sectors of Intervention</h1>
+          <p id="page-subtitle">
+            From instant survival aid to building self-sufficient livelihoods, discover how we make your charity go further.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+
+        <div class="section-header">
+          <h2>Our Core Sectors</h2>
+          <p>
+            We work across six primary areas to provide comprehensive, dignified support to those in need across Pakistan.
+          </p>
+        </div>
+
+        <div class="projects-grid sectors-grid" id="sectors-grid">
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer></footer>
+
+ <script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/main.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      renderSectorsGrid();
+    });
+
+    function renderSectorsGrid() {
+
+      const grid = document.getElementById("sectors-grid");
+      const categories = DataManager.getCategoriesInfo();
+
+      grid.innerHTML = "";
+
+      Object.keys(categories).forEach(key => {
+
+        const cat = categories[key];
+        const iconSvg = window.getIconSvg(cat.icon, cat.color);
+
+        const card = document.createElement("div");
+        card.className = "project-card";
+
+        card.style.setProperty("--category-color", cat.color);
+
+        card.innerHTML = `
+          <div class="project-card-icon">
+            ${iconSvg}
+          </div>
+
+          <h3>${key}</h3>
+
+          <p>${cat.description}</p>
+
+          <a href="./category.html?id=${encodeURIComponent(key)}"
+             class="project-card-link"
+             style="--link-color:${cat.color};">
+
+            <span>View Stories & Updates</span>
+
+            <span class="project-card-link-icon">
+              ${window.getIconSvg("arrowRight", cat.color)}
+            </span>
+
+          </a>
+        `;
+
+        grid.appendChild(card);
+
+      });
+
+    }
+  </script>
+
+</body>
+</html>

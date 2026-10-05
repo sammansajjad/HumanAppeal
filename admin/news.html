@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News & Stories | Human Appeal Pakistan</title>
+  <meta name="description" content="Read our latest news, blogs, and project updates detailing our humanitarian impact across Pakistan.">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/news.css">
+  <link rel="icon" type="image/x-icon" href="../images/logo.ico">
+</head>
+<body>
+
+  <header></header>
+
+  <main>
+
+    <section class="hero hero-news">
+      <div class="hero-overlay"></div>
+
+      <div class="container hero-container hero-container-single">
+        <div class="hero-content hero-content-centered">
+          <h1>News & Project Stories</h1>
+          <p>
+            Read detailed articles and field updates about our developmental and
+            relief works directly from our coordinators on the ground.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+
+        <div class="news-filter-bar">
+
+          <div class="search-wrapper">
+            <span id="search-icon-svg"></span>
+
+            <input
+              type="text"
+              id="news-search"
+              class="form-control news-search-input"
+              placeholder="Search articles by title, author, or keyword..."
+            >
+          </div>
+
+          <select
+            id="news-category-filter"
+            class="form-control news-category-filter"
+          >
+          </select>
+
+        </div>
+
+        <div
+          class="articles-grid news-articles-grid"
+          id="news-articles-grid"
+        >
+        </div>
+
+        <div
+          class="load-more-container news-load-more-container"
+          id="load-more-container"
+        >
+          <button class="btn btn-outline" id="load-more-btn">
+            Load More Stories
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer></footer>
+<script src="../js/config.js"></script>
+  <script src="../js/data.js"></script>
+<script src="../js/main.js"></script>
+
+  <script>
+    let allArticles = [];
+    let filteredArticles = [];
+    let visibleCount = 6;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+
+      document.getElementById("search-icon-svg").innerHTML =
+        window.getIconSvg("search");
+
+      populateCategoryDropdown();
+
+      allArticles = await DataManager.getArticles(false);
+      filteredArticles = [...allArticles];
+
+      renderArticles();
+
+      document
+        .getElementById("news-search")
+        .addEventListener("input", filterArticles);
+
+      document
+        .getElementById("news-category-filter")
+        .addEventListener("change", filterArticles);
+
+      document
+        .getElementById("load-more-btn")
+        .addEventListener("click", () => {
+          visibleCount += 3;
+          renderArticles();
+        });
+
+    });
+
+    function populateCategoryDropdown() {
+
+      const dropdown = document.getElementById("news-category-filter");
+      const categories = Object.keys(DataManager.getCategoriesInfo());
+
+      dropdown.innerHTML = `<option value="all">All Sectors</option>`;
+
+      categories.forEach(cat => {
+        dropdown.innerHTML += `<option value="${cat}">${cat}</option>`;
+      });
+
+    }
+
+    function filterArticles() {
+
+      const query = document
+        .getElementById("news-search")
+        .value
+        .toLowerCase();
+
+      const selectedCategory =
+        document.getElementById("news-category-filter").value;
+
+      filteredArticles = allArticles.filter(art => {
+
+        const matchesQuery =
+          art.title.toLowerCase().includes(query) ||
+          art.excerpt.toLowerCase().includes(query) ||
+          art.author.toLowerCase().includes(query);
+
+        const matchesCategory =
+          selectedCategory === "all" ||
+          art.category === selectedCategory;
+
+        return matchesQuery && matchesCategory;
+
+      });
+
+      visibleCount = 6;
+      renderArticles();
+
+    }
+
+    function renderArticles() {
+
+      const grid = document.getElementById("news-articles-grid");
+      const loadMoreContainer =
+        document.getElementById("load-more-container");
+
+      const catColors = DataManager.getCategoryColors();
+
+      grid.innerHTML = "";
+
+      if (filteredArticles.length === 0) {
+
+        grid.innerHTML = `
+          <div class="news-empty-state">
+            <p class="news-empty-message">
+              No stories or updates found matching your search parameters.
+            </p>
+          </div>
+        `;
+
+        loadMoreContainer.classList.add("hidden");
+        return;
+
+      }
+
+      const visibleSlice =
+        filteredArticles.slice(0, visibleCount);
+
+      visibleSlice.forEach(art => {
+
+        const catColor =
+          catColors[art.category] || "var(--ha-purple)";
+
+        const card = document.createElement("div");
+        card.className = "article-card";
+
+        card.innerHTML = `
+          <div class="article-card-image">
+
+            <span
+              class="article-tag"
+              style="--tag-color:${catColor};">
+              ${art.category}
+            </span>
+
+            <img
+              src="${art.coverImage}"
+              alt="${art.title}"
+              onerror="this.src='https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800'">
+
+          </div>
+
+          <div class="article-card-body">
+
+            <div class="article-meta">
+              <span>By ${art.author}</span>
+              &bull;
+              <span>
+                ${new Date(art.date).toLocaleDateString('en-US',{
+                  month:'short',
+                  day:'numeric',
+                  year:'numeric'
+                })}
+              </span>
+            </div>
+
+            <h3>${art.title}</h3>
+
+            <p>${art.excerpt}</p>
+
+            <a
+              href="./article.html?id=${art.id}"
+              class="article-card-link"
+              style="--link-color:var(--ha-purple);">
+
+              <span>Read Story</span>
+
+              <span class="article-link-icon">
+                ${window.getIconSvg("arrowRight","var(--ha-purple)")}
+              </span>
+
+            </a>
+
+          </div>
+        `;
+
+        grid.appendChild(card);
+
+      });
+
+      if (filteredArticles.length > visibleCount) {
+        loadMoreContainer.classList.remove("hidden");
+      } else {
+        loadMoreContainer.classList.add("hidden");
+      }
+
+    }
+  </script>
+
+</body>
+</html>

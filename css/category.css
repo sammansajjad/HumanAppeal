@@ -1,0 +1,40 @@
+.sidebar-description{
+    font-size:.95rem;
+    color:var(--text-muted);
+    margin-bottom:20px;
+}
+
+.sidebar-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.btn-full{
+    width:100%;
+    justify-content:center;
+    text-align:center;
+}
+
+.coordinator-link{
+    font-size:.95rem;
+}
+
+.empty-category{
+    grid-column:1/-1;
+    text-align:center;
+    padding:50px 0;
+}
+
+.empty-category p{
+    color:var(--text-muted);
+    font-size:1.1rem;
+    margin-bottom:20px;
+}
+
+.icon-inline{
+    width:16px;
+    height:16px;
+    display:inline-flex;
+    align-items:center;
+}

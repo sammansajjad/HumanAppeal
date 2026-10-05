@@ -1,0 +1,24 @@
+.hero-small{
+    padding:60px 0;
+}
+
+.hero-single{
+    grid-template-columns:1fr;
+}
+
+.hero-center{
+    text-align:center;
+    max-width:800px;
+    margin:0 auto;
+}
+
+.sectors-grid{
+    grid-template-columns:repeat(3,1fr);
+}
+
+.icon-inline{
+    width:16px;
+    height:16px;
+    display:inline-flex;
+    align-items:center;
+}

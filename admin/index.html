@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human Appeal Pakistan | Faith-Based Humanitarian Charity</title>
+  <meta name="description" content="Delivering mercy and emergency response to Pakistan's most vulnerable communities. Donate to clean water, food, healthcare, and orphan sponsorship projects.">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/index.css">
+<link rel="icon" type="image/x-icon" href="../images/logo.ico">
+</head>
+<body>
+  <header></header>
+
+  <div class="emergency-strip">
+    <div class="container">
+      <div class="emergency-strip-content">
+        <div>
+          <span class="emergency-tag">Emergency</span>
+          <span>Monsoon recovery operations active in Sindh &amp; Balochistan. Families need shelter and food.</span>
+        </div>
+        <a href="./category.html?id=Emergency%20Relief">Read Updates &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="hero">
+      <div class="hero-overlay"></div>
+
+      <div class="container hero-container">
+
+        <div class="hero-content">
+          <h1 id="hero-title">Delivering Mercy to Pakistan's Most Vulnerable</h1>
+
+          <p id="hero-desc">
+            Human Appeal Pakistan is on the ground, providing clean water,
+            education, health support, and emergency relief to families in need.
+          </p>
+
+          <div class="hero-buttons">
+            <a href="./categories.html" class="btn btn-primary">
+              Explore Sectors
+            </a>
+
+            <a href="./about.html" class="btn btn-outline hero-outline-btn">
+              Our Mission
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-image">
+          <span class="hero-badge">Urgent Appeals</span>
+
+          <img
+            id="hero-img"
+            src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800"
+            alt="Human Appeal Relief Distribution in Pakistan"
+          >
+        </div>
+
+      </div>
+    </section>
+
+    <div class="stats-bar">
+      <div class="container">
+        <div class="stats-grid" id="stats-container"></div>
+      </div>
+    </div>
+
+    <section>
+      <div class="container">
+        <div class="about-split">
+
+          <div class="about-text">
+            <h2>Who We Are</h2>
+
+            <p>
+              <strong>Human Appeal Pakistan</strong> is the dedicated national chapter
+              of Human Appeal international, established to support vulnerable
+              communities across the provinces of Sindh, Punjab, Balochistan,
+              and Khyber Pakhtunkhwa.
+            </p>
+
+            <p>
+              Guided by our faith-inspired values of duty, transparency,
+              and compassion, we implement long-term developmental projects
+              alongside rapid emergency relief during floods, earthquakes,
+              and winter seasons.
+            </p>
+
+            <p>
+              Our goal is not just to provide immediate support,
+              but to construct sustainable infrastructure—like solar water wells
+              and vocational training centers—that allows families to break the
+              cycle of poverty and build self-sufficient futures.
+            </p>
+
+            <a href="./about.html" class="btn btn-secondary">
+              Learn More About Us
+            </a>
+          </div>
+
+          <div class="about-image">
+            <img
+              src="https://images.unsplash.com/photo-1724349619179-a2cbced7b9c2?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              alt="Sustainable clean water project in Balochistan"
+            >
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-section">
+      <div class="container">
+        <div class="quote-content">
+          <p class="quote-text">
+            "And whoever saves one life - it is as if he had saved mankind entirely."
+          </p>
+
+          <p class="quote-source">
+            The Holy Quran (Surah Al-Ma'idah, 5:32)
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-secondary">
+      <div class="container">
+
+        <div class="section-header">
+          <h2>Our Focus Sectors</h2>
+          <p>
+            We work across six primary areas to provide comprehensive,
+            dignified support to those in need across Pakistan.
+          </p>
+        </div>
+
+        <div class="projects-grid" id="projects-grid"></div>
+
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+
+        <div class="section-header">
+          <h2>Latest News &amp; Stories</h2>
+
+          <p>
+            Read updates directly from our staff and coordinators
+            detailing project progress and beneficiary stories.
+          </p>
+        </div>
+
+        <div class="articles-grid" id="recent-articles-grid"></div>
+
+        <div class="view-all-wrapper">
+          <a href="./categories.html" class="btn btn-secondary">
+            View All Stories
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer></footer>
+<script src="../js/config.js"></script>
+  <script src="../js/data.js"></script>
+  <script src="../js/main.js"></script>
+ 
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+
+      setupHeroSlideshow();
+
+      renderProjectGrid();
+
+      renderStatsBar();
+      initCounterAnimation();
+      await renderRecentArticles();
+    });
+
+    function setupHeroSlideshow() {
+      const slides = [
+        {
+          title: "Delivering Mercy to Pakistan's Most Vulnerable",
+          desc: "Human Appeal Pakistan is on the ground, providing clean water, education, health support, and emergency relief to families in need.",
+          img: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800"
+        },
+        {
+          title: "Clean Water: A Foundation for Health & Hope",
+          desc: "We build solar-powered water filtration wells and local hygiene infrastructure in rural Balochistan and Sindh to save lives.",
+          img: "https://images.unsplash.com/photo-1541913757956-49daaa43fa36?q=80&w=800"
+        },
+        {
+          title: "Empowering Children through Education & Care",
+          desc: "We support primary schools, girl's scholarships, and child welfare programs across Pakistan's rural areas.",
+          img: "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?q=80&w=800"
+        }
+      ];
+
+      let currentIndex = 0;
+      const titleEl = document.getElementById("hero-title");
+      const descEl = document.getElementById("hero-desc");
+      const imgEl = document.getElementById("hero-img");
+
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        const currentSlide = slides[currentIndex];
+
+        titleEl.style.opacity = 0;
+        descEl.style.opacity = 0;
+        imgEl.style.opacity = 0;
+
+        setTimeout(() => {
+          titleEl.innerText = currentSlide.title;
+          descEl.innerText = currentSlide.desc;
+          imgEl.src = currentSlide.img;
+
+          titleEl.style.opacity = 1;
+          descEl.style.opacity = 1;
+          imgEl.style.opacity = 1;
+        }, 300);
+
+      }, 6000);
+
+      titleEl.style.transition = "opacity 0.3s ease-in-out";
+      descEl.style.transition = "opacity 0.3s ease-in-out";
+      imgEl.style.transition = "opacity 0.3s ease-in-out";
+    }
+
+    function renderProjectGrid() {
+      const grid = document.getElementById("projects-grid");
+      const categories = DataManager.getCategoriesInfo();
+
+      grid.innerHTML = "";
+
+      Object.keys(categories).forEach(key => {
+
+        const cat = categories[key];
+        const iconSvg = window.getIconSvg(cat.icon, cat.color);
+
+        const card = document.createElement("div");
+        card.className = "project-card";
+        card.style.setProperty("--category-color", cat.color);
+
+        card.innerHTML = `
+          <div class="project-card-icon">${iconSvg}</div>
+
+          <h3>${key}</h3>
+
+          <p>${cat.description}</p>
+
+          <a href="./category.html?id=${encodeURIComponent(key)}" class="project-card-link">
+            <span>Explore Projects</span>
+
+            <span class="icon-inline">
+              ${window.getIconSvg("arrowRight", cat.color)}
+            </span>
+          </a>
+        `;
+
+        grid.appendChild(card);
+
+      });
+    }
+
+    function renderStatsBar() {
+
+      const container = document.getElementById("stats-container");
+
+      const stats = [
+        { icon: "livelihood", target: 443841, suffix: "+", label: "Food Security & Livelihood Assistance" },
+        { icon: "water", target: 201386, suffix: "+", label: "Supported through Water, Sanitation & Hygiene" },
+        { icon: "health", target: 40028, suffix: "+", label: "Received Healthcare & Nutrition Support" },
+        { icon: "emergency", target: 260315, suffix: "+", label: "Assisted in Disasters & Emergency Relief" },
+        { icon: "orphan", target: 10765, suffix: "+", label: "Reached with Shelter & Settlement Assistance" }
+      ];
+
+      container.innerHTML = "";
+
+      stats.forEach(s => {
+
+        const icon = window.getIconSvg(s.icon, "var(--ha-purple)");
+
+        const item = document.createElement("div");
+
+        item.className = "stat-item";
+
+        item.innerHTML = `
+          <div class="stat-icon">${icon}</div>
+
+          <div class="stat-number"
+               data-target="${s.target}"
+               data-suffix="${s.suffix}">
+            0
+          </div>
+
+          <div class="stat-label">${s.label}</div>
+        `;
+
+        container.appendChild(item);
+
+      });
+
+    }
+
+    function initCounterAnimation() {
+
+      const counters = document.querySelectorAll(".stat-number");
+
+      const observer = new IntersectionObserver((entries) => {
+
+        entries.forEach(entry => {
+
+          if (entry.isIntersecting) {
+
+            const target = entry.target;
+
+            const targetVal = parseInt(target.dataset.target);
+
+            const suffix = target.dataset.suffix || "";
+
+            let current = 0;
+
+            const duration = 1000;
+
+            const increment = targetVal / (duration / 16);
+
+            const count = () => {
+
+              current += increment;
+
+              if (current < targetVal) {
+
+                target.innerText = Math.ceil(current).toLocaleString();
+
+                requestAnimationFrame(count);
+
+              } else {
+
+                target.innerText = targetVal.toLocaleString() + suffix;
+
+              }
+
+            };
+
+            count();
+
+            observer.unobserve(target);
+
+          }
+
+        });
+
+      }, { threshold: 0.1 });
+
+      counters.forEach(counter => observer.observe(counter));
+
+    }
+
+    async function renderRecentArticles() {
+
+      const container = document.getElementById("recent-articles-grid");
+
+      const recent = await DataManager.getRecentArticles(3);
+
+      const catColors = DataManager.getCategoryColors();
+
+      container.innerHTML = "";
+
+      if (recent.length === 0) {
+
+        container.innerHTML =
+          `<p class="articles-empty">No articles found. Please check back later.</p>`;
+
+        return;
+
+      }
+
+      recent.forEach(art => {
+
+        const catColor = catColors[art.category] || "var(--ha-purple)";
+
+        const card = document.createElement("div");
+
+        card.className = "article-card";
+
+        card.innerHTML = `
+          <div class="article-card-image">
+
+            <span class="article-tag"
+                  style="background-color:${catColor}">
+              ${art.category}
+            </span>
+
+            <img
+              src="${art.coverImage}"
+              alt="${art.title}"
+              onerror="this.src='https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800'"
+            >
+
+          </div>
+
+          <div class="article-card-body">
+
+            <div class="article-meta">
+              <span>By ${art.author}</span>
+              &bull;
+              <span>${new Date(art.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+            </div>
+
+            <h3>${art.title}</h3>
+
+            <p>${art.excerpt}</p>
+
+            <a href="./article.html?id=${art.id}" class="article-card-link">
+
+              <span>Read Story</span>
+
+              <span class="icon-inline">
+                ${window.getIconSvg("arrowRight","var(--ha-purple)")}
+              </span>
+
+            </a>
+
+          </div>
+        `;
+
+        container.appendChild(card);
+
+      });
+
+    }
+  </script>
+
+</body>
+</html>

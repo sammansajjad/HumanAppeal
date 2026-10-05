@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>
+Manage Users | Human Appeal Pakistan Admin
+</title>
+
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="icon" type="image/x-icon" href="../images/logo.ico">
+</head>
+
+
+<body
+    class="admin-body"
+    data-permission="manage_users"
+>
+
+
+<!-- ===============================
+     ADMIN NAVIGATION
+================================ -->
+
+<div class="admin-nav">
+
+    <div class="container admin-nav-container">
+
+        <h2 style="color:#FFFFFF;font-size:1.4rem;">
+            Administrative Portal
+        </h2>
+
+
+        <div
+            style="
+                display:flex;
+                align-items:center;
+                gap:15px;
+                color:#FFFFFF;
+            "
+        >
+
+            <div
+                style="
+                    text-align:right;
+                    line-height:1.3;
+                "
+            >
+
+                <div
+                    id="current-user-name"
+                    style="font-weight:600;"
+                ></div>
+
+                <div
+                    id="current-user-role"
+                    style="
+                        font-size:0.75rem;
+                        opacity:0.75;
+                    "
+                ></div>
+
+            </div>
+
+
+            <button
+                onclick="adminLogout()"
+                class="btn btn-primary"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===============================
+     MAIN CONTENT
+================================ -->
+
+<main class="container">
+
+    <div class="admin-dashboard-layout">
+
+
+        <!-- ===============================
+             SIDEBAR
+        ================================ -->
+
+        <aside class="admin-sidebar">
+
+            <div
+                id="admin-sidebar-menu-holder"
+            ></div>
+
+        </aside>
+
+
+        <!-- ===============================
+             MAIN
+        ================================ -->
+
+        <section class="admin-main">
+
+            <h2>
+                Manage Users
+            </h2>
+
+
+            <!-- ACTION BAR -->
+
+            <div class="admin-actions-bar">
+
+                <input
+                    id="search-input"
+                    class="form-control"
+                    placeholder="Search users..."
+                >
+
+
+                <button
+                    id="btn-add-user"
+                    class="btn btn-secondary"
+                >
+                    Add New User
+                </button>
+
+            </div>
+
+
+            <!-- USERS TABLE -->
+
+            <div class="table-responsive">
+
+                <table class="admin-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Name</th>
+
+                            <th>Email</th>
+
+                            <th>Role</th>
+
+                            <th>Status</th>
+
+                            <th>Created</th>
+
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="table-body">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<!-- ===============================
+     USER MODAL
+================================ -->
+
+<div
+    class="modal-backdrop"
+    id="user-modal"
+>
+
+    <div class="modal-content">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+            <h3 id="modal-title">
+                Add User
+            </h3>
+
+
+            <button
+                type="button"
+                id="modal-close-x"
+            >
+                X
+            </button>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form id="user-form">
+
+
+            <!-- NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Name
+                </label>
+
+                <input
+                    id="form-name"
+                    class="form-control"
+                    required
+                >
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    id="form-email"
+                    type="email"
+                    class="form-control"
+                    required
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    id="form-password"
+                    type="password"
+                    class="form-control"
+                >
+
+            </div>
+
+
+            <!-- ROLES -->
+
+            <div class="form-group">
+
+                <label>
+                    Roles
+                </label>
+
+
+                <select
+                    id="form-roles"
+                    class="form-control"
+                    multiple
+                    size="8"
+                    required
+                >
+                </select>
+
+
+                <small>
+                    Hold Ctrl and select multiple roles.
+                </small>
+
+            </div>
+
+
+            <!-- MODAL FOOTER -->
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    id="btn-cancel-form"
+                    class="btn btn-outline"
+                >
+                    Cancel
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-secondary"
+                >
+                    Save
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ===============================
+     JAVASCRIPT
+================================ -->
+
+<script src="../js/api.js"></script>
+
+<script src="../js/admin-common.js"></script>
+
+<script src="../js/permissionUI.js"></script>
+
+<script src="../js/config.js"></script>
+<script>
+
+
+// ===============================
+// CURRENT USER
+// ===============================
+
+const currentUser =
+    AuthAPI.requireLogin("./login.html");
+
+
+let users = [];
+
+let roles = [];
+
+let editId = null;
+
+
+// ===============================
+// INITIALIZE
+// ===============================
+
+(async function () {
+
+    if (!currentUser) {
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "current-user-name"
+    ).innerText =
+        currentUser.name || "";
+
+
+    document.getElementById(
+        "current-user-role"
+    ).innerText =
+        currentUser.role || "";
+
+
+    renderAdminSidebar(
+        currentUser,
+        "users.html"
+    );
+
+
+    await loadRoles();
+
+
+    await loadUsers();
+
+})();
+
+
+// ===============================
+// LOAD ROLES
+// ===============================
+
+async function loadRoles() {
+
+    try {
+
+        const response =
+            await API.get("/roles");
+
+
+        console.log(
+            "FULL ROLES RESPONSE:",
+            response
+        );
+
+
+        roles =
+            response.data || [];
+
+
+        console.log(
+            "ROLES:",
+            roles
+        );
+
+
+        renderRoleOptions();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Load Roles Error:",
+            error
+        );
+
+
+        showToast(
+            error.message ||
+            "Unable to load roles",
+            "error"
+        );
+
+    }
+
+}
+
+
+// ===============================
+// RENDER ROLE OPTIONS
+// ===============================
+
+function renderRoleOptions(
+    selectedRoleIds = []
+) {
+
+    const select =
+        document.getElementById(
+            "form-roles"
+        );
+
+
+    if (!select) {
+
+        console.error(
+            "Role select element #form-roles not found"
+        );
+
+        return;
+
+    }
+
+
+    select.innerHTML = "";
+
+
+    roles.forEach(role => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            role.id;
+
+
+        option.textContent =
+            role.name;
+
+
+        if (
+            selectedRoleIds
+                .map(Number)
+                .includes(
+                    Number(role.id)
+                )
+        ) {
+
+            option.selected = true;
+
+        }
+
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+// ===============================
+// LOAD USERS
+// ===============================
+
+async function loadUsers() {
+
+    try {
+
+        const response =
+            await API.get("/users");
+
+
+        console.log(
+            "FULL USERS RESPONSE:",
+            response
+        );
+
+
+        users =
+            response.data || [];
+
+
+        renderUsers();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Load Users Error:",
+            error
+        );
+
+
+        showToast(
+            error.message ||
+            "Unable to load users",
+            "error"
+        );
+
+    }
+
+}
+
+
+// ===============================
+// RENDER USERS
+// ===============================
+
+function renderUsers() {
+
+    const searchInput =
+        document.getElementById(
+            "search-input"
+        );
+
+
+    const search =
+        searchInput
+            ? searchInput.value
+                .toLowerCase()
+                .trim()
+            : "";
+
+
+    let list = users;
+
+
+    if (search) {
+
+        list =
+            users.filter(user => {
+
+                const name =
+                    String(
+                        user.name || ""
+                    ).toLowerCase();
+
+
+                const email =
+                    String(
+                        user.email || ""
+                    ).toLowerCase();
+
+
+                return (
+                    name.includes(search) ||
+                    email.includes(search)
+                );
+
+            });
+
+    }
+
+
+    const tbody =
+        document.getElementById(
+            "table-body"
+        );
+
+
+    if (!tbody) {
+
+        return;
+
+    }
+
+
+    if (list.length === 0) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="6"
+                    style="text-align:center"
+                >
+                    No users found
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        list.map(user => `
+
+            <tr>
+
+                <td>
+                    ${user.name || "-"}
+                </td>
+
+
+                <td>
+                    ${user.email || "-"}
+                </td>
+
+
+                <td>
+                    ${
+                        user.roles &&
+                        user.roles.length
+                            ? user.roles.join(", ")
+                            : "-"
+                    }
+                </td>
+
+
+                <td>
+                    ${
+                        user.is_active
+                            ? "Active"
+                            : "Inactive"
+                    }
+                </td>
+
+
+                <td>
+                    ${user.created_at || "-"}
+                </td>
+
+
+                <td>
+
+                    <button
+                        onclick="editUser(${user.id})"
+                    >
+                        Edit
+                    </button>
+
+
+                    <button
+                        onclick="deleteUser(${user.id})"
+                    >
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `).join("");
+
+}
+
+
+// ===============================
+// SEARCH
+// ===============================
+
+document
+    .getElementById(
+        "search-input"
+    )
+    .addEventListener(
+        "input",
+        renderUsers
+    );
+
+
+// ===============================
+// ADD USER BUTTON
+// ===============================
+
+document
+    .getElementById(
+        "btn-add-user"
+    )
+    .addEventListener(
+        "click",
+        () => openModal()
+    );
+
+
+// ===============================
+// OPEN MODAL
+// ===============================
+
+function openModal(user = null) {
+
+    document
+        .getElementById(
+            "user-form"
+        )
+        .reset();
+
+
+    if (user) {
+
+        editId =
+            user.id;
+
+
+        document
+            .getElementById(
+                "modal-title"
+            )
+            .innerText =
+                "Edit User";
+
+
+        document
+            .getElementById(
+                "form-name"
+            )
+            .value =
+                user.name || "";
+
+
+        document
+            .getElementById(
+                "form-email"
+            )
+            .value =
+                user.email || "";
+
+
+        document
+            .getElementById(
+                "form-password"
+            )
+            .value =
+                "";
+
+
+        renderRoleOptions(
+            user.role_ids || []
+        );
+
+    }
+    else {
+
+        editId = null;
+
+
+        document
+            .getElementById(
+                "modal-title"
+            )
+            .innerText =
+                "Add User";
+
+
+        renderRoleOptions([]);
+
+    }
+
+
+    document
+        .getElementById(
+            "user-modal"
+        )
+        .classList
+        .add("show");
+
+}
+
+
+// ===============================
+// CLOSE MODAL
+// ===============================
+
+function closeModal() {
+
+    document
+        .getElementById(
+            "user-modal"
+        )
+        .classList
+        .remove("show");
+
+}
+
+
+// ===============================
+// CLOSE BUTTON
+// ===============================
+
+document
+    .getElementById(
+        "modal-close-x"
+    )
+    .onclick =
+        closeModal;
+
+
+document
+    .getElementById(
+        "btn-cancel-form"
+    )
+    .onclick =
+        closeModal;
+
+
+// ===============================
+// GET SELECTED ROLES
+// ===============================
+
+function getSelectedRoleIds() {
+
+    const select =
+        document.getElementById(
+            "form-roles"
+        );
+
+
+    if (!select) {
+
+        return [];
+
+    }
+
+
+    return Array.from(
+        select.selectedOptions
+    ).map(
+        option =>
+            Number(option.value)
+    );
+
+}
+
+
+// ===============================
+// SAVE USER
+// ===============================
+
+document
+    .getElementById(
+        "user-form"
+    )
+    .addEventListener(
+        "submit",
+        async function (e) {
+
+            e.preventDefault();
+
+
+            const roleIds =
+                getSelectedRoleIds();
+
+
+            if (
+                roleIds.length === 0
+            ) {
+
+                showToast(
+                    "Please select at least one role",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            const data = {
+
+                name:
+                    document
+                        .getElementById(
+                            "form-name"
+                        )
+                        .value
+                        .trim(),
+
+
+                email:
+                    document
+                        .getElementById(
+                            "form-email"
+                        )
+                        .value
+                        .trim(),
+
+
+                password:
+                    document
+                        .getElementById(
+                            "form-password"
+                        )
+                        .value,
+
+
+                role_ids:
+                    roleIds,
+
+
+                is_active: 1
+
+            };
+
+
+            console.log(
+                "SENDING USER DATA:",
+                data
+            );
+
+
+            try {
+
+                if (editId) {
+
+                    await API.put(
+                        "/users/" +
+                        editId,
+                        data
+                    );
+
+                }
+                else {
+
+                    await API.post(
+                        "/users",
+                        data
+                    );
+
+                }
+
+
+                const wasEditing =
+                    Boolean(editId);
+
+
+                closeModal();
+
+
+                await loadUsers();
+
+
+                showToast(
+                    wasEditing
+                        ? "User updated successfully"
+                        : "User created successfully",
+                    "success"
+                );
+
+
+                editId = null;
+
+            }
+            catch (error) {
+
+                console.error(
+                    "SAVE USER ERROR:",
+                    error
+                );
+
+
+                showToast(
+                    error.message ||
+                    "Save failed",
+                    "error"
+                );
+
+            }
+
+        }
+    );
+
+
+// ===============================
+// EDIT USER
+// ===============================
+
+window.editUser =
+    function (id) {
+
+        const user =
+            users.find(
+                u =>
+                    Number(u.id) ===
+                    Number(id)
+            );
+
+
+        if (!user) {
+
+            showToast(
+                "User not found",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            "EDIT USER:",
+            user
+        );
+
+
+        openModal(user);
+
+    };
+
+
+// ===============================
+// DELETE USER
+// ===============================
+
+window.deleteUser =
+    async function (id) {
+
+        if (
+            Number(id) ===
+            Number(currentUser.id)
+        ) {
+
+            showToast(
+                "You cannot delete yourself",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if (
+            !confirm(
+                "Delete this user?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        try {
+
+            await API.delete(
+                "/users/" + id
+            );
+
+
+            await loadUsers();
+
+
+            showToast(
+                "User deleted",
+                "success"
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "DELETE USER ERROR:",
+                error
+            );
+
+
+            showToast(
+                error.message ||
+                "Delete failed",
+                "error"
+            );
+
+        }
+
+    };
+
+
+// ===============================
+// LOGOUT
+// ===============================
+
+function adminLogout() {
+
+    AuthAPI.logout();
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
